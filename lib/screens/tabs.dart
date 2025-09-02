@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meals/models/meal.dart';
 import 'package:meals/screens/categories.dart';
+import 'package:meals/screens/filters.dart';
 import 'package:meals/screens/meals.dart';
 import 'package:meals/widgets/main_drawer.dart';
 
@@ -16,6 +17,7 @@ class TabsScreen extends StatefulWidget {
 class _TabsScreenState extends State<TabsScreen> {
   int _selectedPageIndex = 0;
   final List<Meal> _favoriteMeals = [];
+  var _currentSettings = FilterSettings();
 
   void _selectPage(index) {
     setState(() {
@@ -47,10 +49,20 @@ class _TabsScreenState extends State<TabsScreen> {
     }
   }
 
-  void _setScreen(String identifier) {
+  void _setScreen(String identifier) async {
+    Navigator.of(context).pop();
     if (identifier == 'filters') {
-    } else {
-      Navigator.of(context).pop();
+      // Navigator.of(context).pushReplacement(
+      final settings = await Navigator.of(context).push<FilterSettings>(
+        MaterialPageRoute(
+          builder: (ctx) => FilterScreen(
+            currentSettings: _currentSettings,
+          ),
+        ),
+      );
+      if (settings != null) {
+        _currentSettings = settings;
+      }
     }
   }
 
@@ -58,6 +70,7 @@ class _TabsScreenState extends State<TabsScreen> {
   Widget build(BuildContext context) {
     Widget activePage = CategoriesScreen(
       onToggleFavorite: _toggleMealFavoriteStatus,
+      filterSettings: _currentSettings,
     );
     var activePageTitle = 'Categories';
     if (_selectedPageIndex == 1) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meals/data/dummy_data.dart';
 import 'package:meals/models/category.dart';
 import 'package:meals/models/meal.dart';
+import 'package:meals/screens/filters.dart';
 import 'package:meals/screens/meals.dart';
 import 'package:meals/widgets/category_grid_item.dart';
 
@@ -9,12 +10,29 @@ class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({
     super.key,
     required this.onToggleFavorite,
+    required this.filterSettings,
   });
 
+  final FilterSettings filterSettings;
   final void Function(Meal meal) onToggleFavorite;
 
   void _selectCategory(BuildContext context, Category category) {
     final filteredMeals = dummyMeals
+        .where((meal) {
+          if (filterSettings.glutenFree && !meal.isGlutenFree) {
+            return false;
+          }
+          if (filterSettings.lactoseFree && !meal.isLactoseFree) {
+            return false;
+          }
+          if (filterSettings.vegetarian && !meal.isVegetarian) {
+            return false;
+          }
+          if (filterSettings.vegan && !meal.isVegan) {
+            return false;
+          }
+          return true;
+        })
         .where((meal) => meal.categories.contains(category.id))
         .toList();
     Navigator.of(context).push(
